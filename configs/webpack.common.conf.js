@@ -8,68 +8,56 @@ const vueLoaderConfig = require('./vue-loader.conf');
 const vueWebTemp = helper.rootNode(config.templateDir);
 const hasPluginInstalled = fs.existsSync(helper.rootNode(config.pluginFilePath));
 const isWin = /^win/.test(process.platform);
-const webEntry = {};
-const weexEntry = {};
+const weexEntry = {
+  'index': helper.root('entry.js')
+}
 
-// Wraping the entry file for web.
-const getWebEntryFileContent = (entryPath, vueFilePath) => {
-  let relativeVuePath = path.relative(path.join(entryPath, '../'), vueFilePath);
-  let relativeEntryPath = helper.root(config.entryFilePath);
+const getEntryFileContent = (source, routerpath) => {
+  let dependence = `import Vue from 'vue'\n`;
+  dependence += `import weex from 'weex-vue-render'\n`;
   let relativePluginPath = helper.rootNode(config.pluginFilePath);
-
+  let entryContents = fs.readFileSync(source).toString();
   let contents = '';
-  let entryContents = fs.readFileSync(relativeEntryPath).toString();
+  entryContents = dependence + entryContents;
+  entryContents = entryContents.replace(/\/\* weex initialized/, match => `weex.init(Vue)\n${match}`);
   if (isWin) {
-    relativeVuePath = relativeVuePath.replace(/\\/g, '\\\\');
     relativePluginPath = relativePluginPath.replace(/\\/g, '\\\\');
   }
   if (hasPluginInstalled) {
     contents += `\n// If detact plugins/plugin.js is exist, import and the plugin.js\n`;
     contents += `import plugins from '${relativePluginPath}';\n`;
     contents += `plugins.forEach(function (plugin) {\n\tweex.install(plugin)\n});\n\n`;
+    entryContents = entryContents.replace(/\.\/router/, routerpath);
     entryContents = entryContents.replace(/weex\.init/, match => `${contents}${match}`);
-    contents = ''
   }
-  contents += `
-const App = require('${relativeVuePath}');
-new Vue(Vue.util.extend({el: '#root'}, App));
-`;
-  return entryContents + contents;
+  return entryContents;
 }
 
-// Wraping the entry file for native.
-const getNativeEntryFileContent = (entryPath, vueFilePath) => {
-  let relativeVuePath = path.relative(path.join(entryPath, '../'), vueFilePath);
-  let contents = '';
-  if (isWin) {
-    relativeVuePath = relativeVuePath.replace(/\\/g, '\\\\');
+const getRouterFileContent = (source) => {
+  const dependence = `import Vue from 'vue'\n`;
+  let routerContents = fs.readFileSync(source).toString();
+  routerContents = dependence + routerContents;
+  return routerContents;
+}
+
+const getEntryFile = () => {
+  const entryFile = path.join(vueWebTemp, config.entryFilePath)
+  const routerFile = path.join(vueWebTemp, config.routerFilePath)
+  fs.outputFileSync(entryFile, getEntryFileContent(helper.root(config.entryFilePath), routerFile));
+  fs.outputFileSync(routerFile, getRouterFileContent(helper.root(config.routerFilePath)));
+  return {
+    index: entryFile
   }
-  contents += `import App from '${relativeVuePath}'
-App.el = '#root'
-new Vue(App)
-`;
-  
-  return contents;
 }
 
-// Retrieve entry file mappings by function recursion
-const getEntryFile = (dir) => {
-  dir = dir || config.sourceDir;
-  const entries = glob.sync(`${dir}/${config.entryFilter}`, config.entryFilterOptions);
-  entries.forEach(entry => {
-    const extname = path.extname(entry);
-    const basename = entry.replace(`${dir}/`, '').replace(extname, '');
-    const templatePathForWeb = path.join(vueWebTemp, basename + '.web.js');
-    const templatePathForNative = path.join(vueWebTemp, basename + '.js');
-    fs.outputFileSync(templatePathForWeb, getWebEntryFileContent(templatePathForWeb, entry));
-    fs.outputFileSync(templatePathForNative, getNativeEntryFileContent(templatePathForNative, entry));
-    webEntry[basename] = templatePathForWeb;
-    weexEntry[basename] = templatePathForNative;
-  })
-}
-
-// Generate an entry file array before writing a webpack configuration
-getEntryFile();
+// The entry file for web needs to add some library. such as vue, weex-vue-render
+// 1. src/entry.js 
+// import Vue from 'vue';
+// import weex from 'weex-vue-render';
+// weex.init(Vue);
+// 2. src/router/index.js
+// import Vue from 'vue'
+const webEntry = getEntryFile();
 
 
 const createLintingRule = () => ({

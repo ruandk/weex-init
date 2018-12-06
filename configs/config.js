@@ -7,18 +7,12 @@ const config = {
   pluginConfigPath: 'plugins/plugins.json',
   pluginFilePath: 'plugins/plugins.js',
   // router
+  routerFilePath: 'router.js',
   // common
-  sourceDir: 'src',
   templateDir: '.temp',
   entryFilePath: 'entry.js',
   // Module exclude from compile process
   excludeModuleReg: /node_modules(?!(\/|\\).*(weex).*)/,
-  // Filter for entry files
-  // see: https://www.npmjs.com/package/glob#glob-primer
-  entryFilter: '**/*.vue',
-  // Options for the filter
-  // see: https://www.npmjs.com/package/glob#options
-  entryFilterOptions: {},
   dev: {
     // Various Dev Server settings
     contentBase: ROOT,
