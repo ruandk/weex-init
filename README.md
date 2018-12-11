@@ -35,28 +35,28 @@ npm run serve/start
 
 # 源码目录
 
-├── src // 源码
-│ ├── assets // 公共目录
-│ │ ├── images // 静态图片目录
-│ │ ├── styles // 公共样式目录
-│ │ ├── js // 公用 js 目录
-│ │ │ ├── utils.js // 通用工具方法
-│ │ │ ├── api.js // api 目录
-│ │ │ ├── stream.js // 封装请求
-│ │ │ └── getBaseURL.js // 页面跳转拼接路径(非路由模式)
-│ ├── components // 组件目录
-│ │ │ └── common // 公共组件
-│ ├── store // 状态管理
-│ ├── views // 页面目录
-│ ├── router.js // 路由表
-│ ├── entry.js // 主入口 js
+├── src // 源码  
+│ ├── assets // 公共目录  
+│ │ ├── images // 静态图片目录  
+│ │ ├── styles // 公共样式目录  
+│ │ ├── js // 公用 js 目录  
+│ │ │ ├── utils.js // 通用工具方法  
+│ │ │ ├── api.js // api 目录  
+│ │ │ ├── stream.js // 封装请求  
+│ │ │ └── getBaseURL.js // 页面跳转拼接路径(非路由模式)  
+│ ├── components // 组件目录  
+│ │ │ └── common // 公共组件  
+│ ├── store // 状态管理  
+│ ├── views // 页面目录  
+│ ├── router.js // 路由表  
+│ ├── entry.js // 主入口 js  
 │ ├── index.vue // 入口页面
 
 # 路由模式
 
 ## 不建议使用路由模式
 
-使用路由模式最终只会生成一个 index.js 文件，如果项目复杂，该文件可能很大
+使用路由模式最终只会生成一个 index.js 文件，如果项目复杂，该文件可能很大  
 跳转没有动画，试了 transition 没成功
 
 ## 路由相关坑
@@ -67,7 +67,7 @@ npm run serve/start
 /* weex initialized here, please do not move this line */
 ```
 
-entry.js 中有这么一行注释，别动它！我曾经把这行注释删掉了，结果项目都无法运行
+entry.js 中有这么一行注释，别动它！我曾经把这行注释删掉了，结果项目都无法运行  
 因为/configs/webpack.common.conf.js 中有这么一行
 
 ```js
@@ -93,7 +93,7 @@ START WEEX VUE RENDER: 0.12.21, Build 2017-10-12 15:49.
 
 页面路径：
 
-h5: http://172.25.127.66:8080/web/index.html?page=/dist/views/home.js
+h5: http://172.25.127.66:8080/web/index.html?page=/dist/views/home.js  
 app: http://172.25.127.66:8080/dist/views/home.js
 
 升级后 weex 版本
@@ -106,10 +106,10 @@ START WEEX VUE RENDER: 1.0.33, Build 2018-10-10 18:12.
 
 新版本页面路径：
 
-h5: http://172.25.127.66:8080/views/home.html
+h5: http://172.25.127.66:8080/views/home.html  
 http://172.25.127.66:8080/#/home (router)
 
-app: http://172.25.127.66:8080/dist/views/home.js
+app: http://172.25.127.66:8080/dist/views/home.js  
 http://172.25.127.66:8080/dist/index.js (router)
 
 可见升级后 app 页面路径没变，h5 从原来的切换 js 变成了跳转不同 html,当然这应该都可以通过改变 webpack 配置实现
